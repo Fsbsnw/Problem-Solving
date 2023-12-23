@@ -12,16 +12,16 @@ def GCD(a, b):
 def solution(arrayA, arrayB):
     gcd_A = GCDS(arrayA)
     gcd_B = GCDS(arrayB)
-    result = 0
+    result = [0]
     for i in arrayA:
         if i % gcd_B == 0:
             break
     else:
-        result = gcd_B    
+        result.append(gcd_B)
     
     for i in arrayB:
         if i % gcd_A == 0:
             break
     else:
-        result = max(result, gcd_A)
-    return result
+        result.append(gcd_A)
+    return max(result)
