@@ -1,31 +1,35 @@
-from collections import defaultdict
-
-def find(parent, a):
-    if parent[a] != a:
-        parent[a] = find(parent, parent[a])
-    return parent[a]
-
-def union(parent, a, b):
-    pa = find(parent, a)
-    pb = find(parent, b)
-    if pa != pb:
-        parent[pa] = parent[pb]
+from collections import Counter
 
 def solution(n, wires):
-    answer = int(10e9)
-    for skip in range(len(wires)):
-        parent = [i for i in range(n+1)]
-        for idx, wire in enumerate(wires):
-            if skip == idx:
-                continue
-            if find(parent, wire[0]) != find(parent, wire[1]):
-                union(parent, wire[0], wire[1])
-        
-        group_value = defaultdict(int)
-        for i in range(1, n+1):
-            group_value[find(parent, i)] += 1
-        values = list(group_value.values())
-        groupA, groupB = values[0], values[1]
-        answer = min(answer, abs(groupA - groupB))
-             
-    return answer
+    wires.sort(key = lambda x : x[0])
+    
+    def find(x):
+        if parent[x] != x:
+            return find(parent[x])
+        else:
+            return x
+
+    def union(a, b):
+        a = find(a)
+        b = find(b)
+        if a < b:
+            parent[b] = a
+        else:
+            parent[a] = b
+            
+    result = n
+    
+    for val in wires:
+        parent = [j for j in range(n + 1)]
+        for wire in wires:
+            if val != wire and find(wire[0]) != find(wire[1]):
+                union(wire[0], wire[1])
+                
+        counting = []
+        for i in range(1, n + 1):
+            counting.append(find(i))
+        counting = Counter(counting)
+        counting = list(counting.values())
+        result = min(result, abs(counting[0] - counting[1]))
+    
+    return result
