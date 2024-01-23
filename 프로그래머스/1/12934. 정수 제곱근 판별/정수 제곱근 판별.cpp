@@ -1,21 +1,15 @@
 #include <string>
 #include <vector>
-#include <cmath>
 
 using namespace std;
 
-long long prime(long long num) {
-    for (long long i = 1; i < sqrt(num) + 1; i++)
+long long solution(long long n) {
+    for (long long i = 1; i * i <= n; i++)
     {
-        if (i * i == num)
+        if (i * i == n)
         {
             return (i + 1) * (i + 1);
         }
     }
     return -1;
-}
-
-long long solution(long long n) {
-    long long answer = prime(n);
-    return answer;
 }
