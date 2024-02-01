@@ -4,10 +4,10 @@
 using namespace std;
 
 int divisor(int num) {
-    int cnt = 1;
-    for (int i = 1; i <= num / 2; i++) {
+    int cnt = 0;
+    for (int i = 1; i * i <= num; i++) {
         if (num % i == 0) {
-            cnt++;
+            (i * i == num) ? cnt++ : cnt += 2;
         }
     }
     return cnt;
