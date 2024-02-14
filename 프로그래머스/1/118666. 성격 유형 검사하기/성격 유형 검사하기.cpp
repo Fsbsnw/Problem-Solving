@@ -13,28 +13,13 @@ string solution(vector<string> survey, vector<int> choices) {
         char first = survey[i][0];
         char second = survey[i][1];
         
-        switch (choices[i])
+        if (choices[i] < 4)
         {
-            case 1:
-                counting[first] += 3;
-                break;
-            case 2:
-                counting[first] += 2;
-                break;
-            case 3:
-                counting[first] += 1;
-                break;
-            case 5:
-                counting[second] += 1;
-                break;
-            case 6:
-                counting[second] += 2;
-                break;
-            case 7:
-                counting[second] += 3;
-                break;
-            default:
-                break;
+            counting[first] += 4 - choices[i];
+        }
+        else
+        {
+            counting[second] += choices[i] - 4;
         }
     }
     
