@@ -1,18 +1,23 @@
 #include <iostream>
-#include <string>
-#include <algorithm>
+
 using namespace std;
- 
-int main() {
+
+int main()
+{
     string s;
     cin >> s;
-    int len, zero = 0, one = 0;
-    len = s.length();
-    for (int i = 0; i < len; i++) {
-        if (s[i] != s[i+1]) {
-            if (s[i] == '0') { zero++; }
-            else if (s[i] == '1') { one++; }
+    
+    int cnt0 = 0, cnt1 = 0;
+    
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (s[i] != s[i + 1])
+        {
+            if (s[i] == '1') cnt1++;
+            else cnt0++;
         }
     }
-    cout << min(zero, one);
+
+    cout << min(cnt0, cnt1);
+    return 0;
 }
