@@ -21,6 +21,8 @@ void dij(int start)
         int now = pq.top().second;
         pq.pop();
         
+        if (dist[now] < cost) continue;
+        
         for (int i = 0; i < v[now].size(); i++)
         {
             int ncost = v[now][i].first + cost;
