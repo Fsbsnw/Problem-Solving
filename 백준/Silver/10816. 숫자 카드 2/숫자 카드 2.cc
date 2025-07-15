@@ -1,92 +1,78 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <map>
 
 using namespace std;
 
-vector<int> cards, check;
-map<int, int> h;
-
-int binary(int x)
+int LowerBound(vector<int>& Cards, int Target)
 {
-    int l = 0, r = cards.size() - 1, m = 0, cnt = 0;
+    int Left = 0;
+    int Right = Cards.size() - 1;
     
-    while (l <= r)
+    while (Left <= Right)
     {
-        m = (l + r) / 2;
+        int Mid = (Left + Right) / 2;
         
-        if (x < cards[m])
+        if (Target <= Cards[Mid])
         {
-            r = m - 1;
-        }
-        else if (x > cards[m])
-        {
-            l = m + 1;
+            Right = Mid - 1;
         }
         else
         {
-            l = m;
-            cnt++;
-            break;
+            Left = Mid + 1;
         }
     }
+    return Left;
+}
+
+int UpperBound(vector<int>& Cards, int Target)
+{
+    int Left = 0;
+    int Right = Cards.size() - 1;
     
-    if (l > r) return cnt;
-    
-    l = m - 1;
-    r = m + 1;
-    
-    while (l >= 0 && cards[l] == x)
+    while (Left <= Right)
     {
-        cnt++;
-        l--;
+        int Mid = (Left + Right) / 2;
+        
+        if (Target >= Cards[Mid])
+        {
+            Left = Mid + 1;
+        }
+        else
+        {
+            Right = Mid - 1;
+        }
     }
-    while (r < cards.size() && cards[r] == x)
-    {
-        cnt++;
-        r++;
-    }
-    
-    h[x] = cnt;
-    return cnt;
+    return Left;
 }
 
 int main()
 {
-    int n;
-    cin >> n;
+    ios::sync_with_stdio(false);
+    cin.tie(0);
     
-    for (int i = 0; i < n; i++)
+    int N; 
+    cin >> N;
+    vector<int> Cards(N);
+    for (int i = 0; i < N; i++)
     {
-        int temp;
-        cin >> temp;
-        cards.push_back(temp);
+        cin >> Cards[i];
     }
     
-    sort(cards.begin(), cards.end());
+    sort(Cards.begin(), Cards.end());
     
-    int m;
-    cin >> m;
-    
-    for (int i = 0; i < m; i++)
+    int M;
+    cin >> M;
+    vector<int> CardsToFind(M);
+    for (int i = 0; i < M; i++)
     {
-        int temp;
-        cin >> temp;
-        check.push_back(temp);
+        cin >> CardsToFind[i];
+        
+        int Lower = LowerBound(Cards, CardsToFind[i]);
+        int Upper = UpperBound(Cards, CardsToFind[i]);
+        
+        cout << Upper - Lower << ' ';
     }
-    
-    for (int i = 0; i < check.size(); i++)
-    {
-        if (h[check[i]])
-        {
-            cout << h[check[i]] << ' ';
-        }
-        else
-        {
-            cout << binary(check[i]) << ' ';
-        }
-    }
-    
+
     return 0;
 }
