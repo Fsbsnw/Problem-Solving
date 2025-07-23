@@ -7,6 +7,10 @@ int BrightnessPrefixSum[1001][1001];
 
 int main()
 {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
     int R, C, Q;
     cin >> R >> C >> Q;
     
@@ -27,7 +31,7 @@ int main()
         int Count = (r2 - r1 + 1) * (c2 - c1 + 1);
         int BrightnessSum = BrightnessPrefixSum[r2][c2] - BrightnessPrefixSum[r1 - 1][c2] - BrightnessPrefixSum[r2][c1 - 1] + BrightnessPrefixSum[r1 - 1][c1 - 1];
         
-        printf("%d\n", BrightnessSum / Count);
+        cout << BrightnessSum / Count << '\n';
     }
 
     return 0;
