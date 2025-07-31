@@ -1,11 +1,13 @@
 #include<iostream>
 
+using namespace std;
+
 int main()
 {
     int N;
-    scanf("%d", &N);
+    cin >> N;
     
-    long long DP[41];
+    long long DP[81];
     
     DP[1] = 1;
     DP[2] = 1;
@@ -15,9 +17,8 @@ int main()
         DP[i] = DP[i - 2] + DP[i - 1];
     }
     
-    long long Result = DP[N] * 2 + (DP[N - 1] + DP[N]) * 2;
-    
-    printf("%d", Result);
+    long long Result = (N == 1) ? 4 : 2 * (DP[N] + DP[N] + DP[N - 1]);
+    cout << Result;
 
     return 0;
 }
