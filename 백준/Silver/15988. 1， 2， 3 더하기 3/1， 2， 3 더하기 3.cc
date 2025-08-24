@@ -5,7 +5,7 @@ using namespace std;
 #define MAX 1000000
 #define MOD 1000000009
 
-long long DP[1000001];
+long long DP[MAX + 1];
 
 int main()
 {
