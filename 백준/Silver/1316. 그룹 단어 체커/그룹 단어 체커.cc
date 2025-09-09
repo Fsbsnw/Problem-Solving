@@ -3,11 +3,20 @@
 
 using namespace std;
 
-bool IsGroupedWord(vector<int>& Arr)
+bool IsGroupedWord(const string& S)
 {
-    for (int i = 0; i < Arr.size() - 1; i++)
+    vector<bool> Visited(26);
+    char Prev = ' ';
+    
+    for (char C : S)
     {
-        if (Arr[i] - Arr[i + 1] != 1) return false;
+        if (C != Prev)
+        {
+            if (Visited[C - 'a']) return false;
+            
+            Visited[C - 'a'] = true;
+            Prev = C;
+        }
     }
     return true;
 }
@@ -24,26 +33,7 @@ int main()
         string S;
         cin >> S;
         
-        bool bIsGroupedWord = true;
-        
-        for (int i = 1; i < S.size(); i++)
-        {
-            vector<int> Arr;
-            Arr.push_back(i);
-            
-            for (int k = i - 1; k >= 0; k--)
-            {
-                if (S[i] == S[k]) Arr.push_back(k);
-            }
-            
-            if (!IsGroupedWord(Arr)) 
-            {
-                bIsGroupedWord = false;
-                break;
-            }
-        }
-        
-        if (bIsGroupedWord) Count++;
+        if (IsGroupedWord(S)) Count++;
     }
     
     cout << Count;
