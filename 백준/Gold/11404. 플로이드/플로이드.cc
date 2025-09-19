@@ -1,52 +1,53 @@
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 
-int INF = 987654321;
-int v[101][101];
+#define INF 100000 * 101
 
 int main()
 {
-    int n, m;
-    cin >> n >> m;
+	ios::sync_with_stdio(0); 
+	cin.tie(0); 
+	cout.tie(0);     
+
+    int N, M;
+    cin >> N >> M;
     
-    for (int i = 1; i <= n; i++) fill(v[i], v[i] + 101, INF);
+    vector<vector<int>> Graph(N + 1, vector<int>(N + 1, INF));
     
-    for (int i = 0; i < m; i++)
+    for (int i = 1; i <= N; ++i) Graph[i][i] = 0;
+    
+    for (int i = 0; i < M; ++i)
     {
-        int a, b, c;
-        cin >> a >> b >> c;
+        int x, y, w;
+        cin >> x >> y >> w;
         
-        if (v[a][b]) v[a][b] = min(v[a][b], c);
-        else v[a][b] = c;
+        Graph[x][y] = min(Graph[x][y], w);
     }
     
-    for (int k = 1; k <= n; k++)
+    for (int k = 1; k <= N; ++k)
     {
-        for (int i = 1; i <= n; i++)
+        for (int i = 1; i <= N; ++i)
         {
-            for (int j = 1; j <= n; j++)
+            for (int j = 1; j <= N; ++j)
             {
-                if (k == i || k == j) continue;
-                if (i == j) v[i][j] = 0;
-                
-                if (v[i][j] > v[i][k] + v[k][j])
-                {
-                    v[i][j] = v[i][k] + v[k][j];
-                }
+                Graph[i][j] = min(Graph[i][j], Graph[i][k] + Graph[k][j]);
             }
         }
     }
     
-    for (int i = 1; i <= n; i++)
+    for (int i = 1; i <= N; ++i)
     {
-        for (int j = 1; j <= n; j++)
+        for (int j = 1; j <= N; ++j)
         {
-            if (v[i][j] == INF) cout << 0 << ' ';
-            else cout << v[i][j] << ' ';
+            if (Graph[i][j] == INF) cout << "0 ";
+            else cout << Graph[i][j] << ' ';
         }
         cout << '\n';
     }
-
+    
     return 0;
 }
