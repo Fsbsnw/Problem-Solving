@@ -1,5 +1,4 @@
 #include <string>
-#include <iostream>
 #include <vector>
 #include <algorithm>
 
@@ -20,14 +19,19 @@ vector<int> solution(int N, vector<int> stages) {
     int Length = stages.size();
     for (int i = 1; i <= N; ++i)
     {
-        float Fail = float(Counts[i]) / float(Length);
-        temp.push_back({-Fail, i});
+        float Fail = (Length == 0) ? 0.f : float(Counts[i]) / float(Length);
+        temp.push_back({Fail, i});
         Length -= Counts[i];
     }
     
-    sort(temp.begin(), temp.end());
+    sort(temp.begin(), temp.end(), 
+        [](const pair<float, int>& a, const pair<float, int>& b)
+         {
+             return (a.first == b.first) ? a.second < b.second : a.first > b.first;
+         }
+    );
     
-    for (pair<int, int> Fails : temp)
+    for (pair<float, int> Fails : temp)
     {
         answer.push_back(Fails.second);
     }

@@ -1,10 +1,10 @@
 # [level 1] 실패율 - 42889 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42889?language=cpp) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42889?language=cpp#) 
 
 ### 성능 요약
 
-메모리: 9.93 MB, 시간: 0.87 ms
+메모리: 9.98 MB, 시간: 0.94 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 22일 16:25:50
+2025년 10월 22일 16:36:26
 
 ### 문제 설명
 
