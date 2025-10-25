@@ -1,22 +1,20 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <algorithm>
+#include <set>
 
 using namespace std;
 
 bool solution(vector<string> phone_book) {
     bool answer = true;
     
-    sort(phone_book.begin(), phone_book.end());
+    set<string> S(phone_book.begin(), phone_book.end());
     
-    for (int i = 0; i < phone_book.size() - 1; i++)
+    for (auto It = S.begin(); next(It) != S.end(); ++It)
     {
-        if (phone_book[i] == phone_book[i + 1].substr(0, phone_book[i].size()))
-        {
-            return false;
-        }
+        string Curr = *It;
+        string Next = *next(It);
+        if (Next.substr(0, Curr.size()) == Curr) answer = false;
     }
     
     return answer;
