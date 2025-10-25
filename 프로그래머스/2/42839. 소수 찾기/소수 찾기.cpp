@@ -30,9 +30,7 @@ void FindPrime(string s, string numbers)
         if (Used[i]) continue;
         
         Used[i] = true;
-        s.push_back(numbers[i]);
-        FindPrime(s, numbers);
-        s.pop_back();
+        FindPrime(s + numbers[i], numbers);
         Used[i] = false;
     }
 }
