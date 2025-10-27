@@ -3,136 +3,147 @@
 
 using namespace std;
 
-#define DIRECTION_TOP 0
-#define DIRECTION_BOTTOM 1
-#define DIRECTION_LEFT 2
-#define DIRECTION_RIGHT 3
+const int TOP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 
-int BoardHeight, BoardWidth;
-vector<vector<char>> GameBoard;
-pair<int, int> HolePosition;
-pair<int, int> RedBeadPosition;
-pair<int, int> BlueBeadPosition;
-int MinMoveCount = 11; 
+int dx[4] = {-1, 0, 1, 0};
+int dy[4] = {0, 1, 0, -1};
 
-int dx[] = {-1, 1, 0, 0};
-int dy[] = {0, 0, -1, 1};
+int N, M, Answer = 11;
+int Depth = 0;
+int bx = 0, by = 0;
+int rx = 0, ry = 0;
+vector<vector<char>> Board;
 
-
-pair<int, int> CalculateFinalBeadPosition(pair<int, int> BeadPosition, int Direction)
+bool IsInBoard(int x, int y)
 {
-	int CurrentX = BeadPosition.first;
-	int CurrentY = BeadPosition.second;
-
-	// 벽('#')이나 구멍('O')을 만날 때까지 해당 방향으로 계속 이동합니다.
-	while (true)
-	{
-		CurrentX += dx[Direction];
-		CurrentY += dy[Direction];
-
-		// 보드 범위를 벗어나거나 벽을 만나면, 바로 직전 위치가 최종 위치입니다.
-		if (CurrentX < 0 || CurrentX >= BoardHeight || CurrentY < 0 || CurrentY >= BoardWidth || GameBoard[CurrentX][CurrentY] == '#')
-		{
-			// 이동 방향의 반대로 한 칸 되돌아갑니다.
-			CurrentX -= dx[Direction];
-			CurrentY -= dy[Direction];
-			break;
-		}
-
-		// 구멍을 만나면, 구슬이 빠져나가므로 루프를 종료합니다.
-		if (GameBoard[CurrentX][CurrentY] == 'O')
-		{
-			break;
-		}
-	}
-	return {CurrentX, CurrentY};
+    return (0 <= x && x < N && 0 <= y && y < M && (Board[x][y] != '#' && Board[x][y] != 'O'));
 }
 
-void SolvePuzzleRecursive(pair<int, int> CurrentRedPos, pair<int, int> CurrentBluePos, int CurrentMoveCount)
+bool IsGameOver(int x, int y)
 {
-	// 10회를 초과하여 움직이면 실패로 간주하고 탐색을 중단합니다.
-	if (CurrentMoveCount >= MinMoveCount || CurrentMoveCount > 10)
-	{
-		return;
-	}
+    return Board[x][y] == 'O';
+}
 
-	// 4가지 방향(상, 하, 좌, 우)으로 기울이는 경우를 모두 탐색합니다.
-	for (int Direction = 0; Direction < 4; ++Direction)
-	{
-		pair<int, int> NextRedPos = CalculateFinalBeadPosition(CurrentRedPos, Direction);
-		pair<int, int> NextBluePos = CalculateFinalBeadPosition(CurrentBluePos, Direction);
+void TiltBoard(int Direction)
+{
+    int bbx = bx, bby = by;
+    int rrx = rx, rry = ry;
+    
+    Board[bx][by] = '.';
+    Board[rx][ry] = '.';
+    
+    while (IsInBoard(bbx, bby))
+    {
+        bbx += dx[Direction]; bby += dy[Direction];
+    }
+    
+    while (IsInBoard(rrx, rry))
+    {
+        rrx += dx[Direction]; rry += dy[Direction];
+    }
+    
+    if (IsGameOver(bbx, bby) || IsGameOver(rrx, rry))
+    {
+        bx = bbx; by = bby;
+        rx = rrx; ry = rry;
+        return;
+    }
+    
+    bbx -= dx[Direction]; bby -= dy[Direction];
+    rrx -= dx[Direction]; rry -= dy[Direction];
+    
+    if (bbx == rrx && bby == rry)
+    {
+        switch (Direction)
+        {
+            case TOP:
+                if (bx < rx) rrx -= dx[Direction];
+                else bbx -= dx[Direction];
+                break;
+                
+            case RIGHT:
+                if (by < ry) bby -= dy[Direction];
+                else rry -= dy[Direction];
+                break;
+                
+            case DOWN:
+                if (bx < rx) bbx -= dx[Direction];
+                else rrx -= dx[Direction];
+                break;
+                
+            case LEFT:
+                if (by < ry) rry -= dy[Direction];
+                else bby -= dy[Direction];
+                break;
+        }
+    }
+    
+    bx = bbx; by = bby;
+    rx = rrx; ry = rry;
+    
+    Board[bx][by] = 'B';
+    Board[rx][ry] = 'R';
+}
 
-		// 파란 구슬이 구멍에 빠진 경우, 이 경로는 실패이므로 건너뜁니다.
-		if (NextBluePos == HolePosition)
-		{
-			continue;
-		}
-
-		// 빨간 구슬만 구멍에 빠진 경우, 성공입니다. 최소 이동 횟수를 갱신하고 탐색을 종료합니다.
-		if (NextRedPos == HolePosition)
-		{
-			MinMoveCount = min(MinMoveCount, CurrentMoveCount + 1);
-			return;
-		}
-
-		// 두 구슬의 최종 위치가 구멍이 아닌 곳에서 겹치는 경우, 위치를 조정합니다.
-		if (NextRedPos == NextBluePos)
-		{
-			// 기울인 방향을 기준으로 원래 더 뒤에 있었던 구슬을 한 칸 뒤로 이동시킵니다.
-			switch (Direction)
-			{
-				case DIRECTION_TOP:    CurrentRedPos.first > CurrentBluePos.first ? NextRedPos.first++ : NextBluePos.first++;       break;
-				case DIRECTION_BOTTOM: CurrentRedPos.first < CurrentBluePos.first ? NextRedPos.first-- : NextBluePos.first--;       break;
-				case DIRECTION_LEFT:   CurrentRedPos.second > CurrentBluePos.second ? NextRedPos.second++ : NextBluePos.second++;   break;
-				case DIRECTION_RIGHT:  CurrentRedPos.second < CurrentBluePos.second ? NextRedPos.second-- : NextBluePos.second--;   break;
-			}
-		}
-
-		// 현재 위치와 다음 위치가 동일하면 더 이상 탐색할 필요가 없습니다.
-		if (NextRedPos == CurrentRedPos && NextBluePos == CurrentBluePos)
-		{
-			continue;
-		}
-
-		// 다음 상태로 재귀 호출을 진행합니다.
-		SolvePuzzleRecursive(NextRedPos, NextBluePos, CurrentMoveCount + 1);
-	}
+void PlayBeadGame(int PrevDirection)
+{
+    if (Depth > 10 || IsGameOver(bx, by)) return;
+    if (IsGameOver(rx, ry))
+    {
+        Answer = min(Answer, Depth);
+        return;
+    }
+    
+    for (int Direction = 0; Direction < 4; ++Direction)
+    {
+        if (PrevDirection == TOP && Direction == DOWN) continue;
+        if (PrevDirection == RIGHT && Direction == LEFT) continue;
+        if (PrevDirection == DOWN && Direction == TOP) continue;
+        if (PrevDirection == LEFT && Direction == RIGHT) continue;
+        
+        vector<vector<char>> Temp = Board;
+        int bbx = bx, bby = by;
+        int rrx = rx, rry = ry;
+        ++Depth;
+        
+        TiltBoard(Direction);
+        
+        if (bx != bbx || by != bby || rx != rrx || ry != rry)
+        {
+            PlayBeadGame(Direction);
+        }
+        
+        --Depth;
+        bx = bbx, by = bby;
+        rx = rrx, ry = rry;
+        Board = Temp;
+    }
 }
 
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL);
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    
+    cin >> N >> M;
+    
+    Board.assign(N, vector<char>(M));
+    
+    for (int i = 0; i < N; ++i)
+    {
+        for (int j = 0; j < M; ++j)
+        {
+            cin >> Board[i][j];
+            
+            if (Board[i][j] == 'R') { rx = i; ry = j; }
+            else if (Board[i][j] == 'B') { bx = i; by = j; }
+        }
+    }
+    
+    PlayBeadGame(-1);
+    
+    cout << ((Answer == 11) ? -1 : Answer);
 
-	cin >> BoardHeight >> BoardWidth;
-	GameBoard.resize(BoardHeight, vector<char>(BoardWidth));
-
-	for (int i = 0; i < BoardHeight; i++)
-	{
-		for (int j = 0; j < BoardWidth; j++)
-		{
-			cin >> GameBoard[i][j];
-
-			if (GameBoard[i][j] == 'B')
-			{
-				BlueBeadPosition = {i, j};
-				GameBoard[i][j] = '.';
-			}
-			else if (GameBoard[i][j] == 'R')
-			{
-				RedBeadPosition = {i, j};
-				GameBoard[i][j] = '.'; 
-			}
-			else if (GameBoard[i][j] == 'O')
-			{
-				HolePosition = {i, j};
-			}
-		}
-	}
-	
-	SolvePuzzleRecursive(RedBeadPosition, BlueBeadPosition, 0);
-	
-	cout << ((MinMoveCount == 11) ? -1 : MinMoveCount);
-
-	return 0;
+    return 0;
 }
