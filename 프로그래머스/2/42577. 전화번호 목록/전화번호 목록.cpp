@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
 
 struct TrieNode
 {
-    TrieNode* Child[10] = {nullptr, };
+    unordered_map<char, TrieNode*> Child;
+    // TrieNode* Child[10] = {nullptr, };
     bool bIsEnd = false;
 };
 
@@ -23,24 +25,22 @@ class Trie
         {
             TrieNode* Current = Root;
             for (char c : Word)
-            {
-                int Index = c - '0';
-                
+            {                
                 if (Current->bIsEnd) return false;
                 
-                if (Current->Child[Index] == nullptr)
+                if (Current->Child.find(c) == Current->Child.end())
                 {
-                    Current->Child[Index] = new TrieNode();
+                    Current->Child[c] = new TrieNode();
                 }
                 
-                Current = Current->Child[Index];
+                Current = Current->Child[c];
             }
             
             Current->bIsEnd = true;
             
             for (int i = 0; i < 10; ++i)
             {
-                if (Current->Child[i] != nullptr) return false;
+                if (Current->Child.find(i + '0') != Current->Child.end()) return false;
             }
             
             return true;
