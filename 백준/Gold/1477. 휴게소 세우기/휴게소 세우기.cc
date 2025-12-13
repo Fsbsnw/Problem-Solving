@@ -6,51 +6,48 @@ using namespace std;
 
 int main()
 {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
     int N, M, L;
     cin >> N >> M >> L;
     
-    vector<int> Rests;
+    vector<int> Rest(N);
     
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N; ++i)
     {
-        int Temp;
-        cin >> Temp;
-        
-        Rests.push_back(Temp);
+        cin >> Rest[i];
     }
     
-    Rests.push_back(0);
-    Rests.push_back(L);
+    Rest.push_back(0);
+    Rest.push_back(L);
     
-    sort(Rests.begin(), Rests.end());
+    sort(Rest.begin(), Rest.end());
     
-    int Left = 1;
-    int Right = L;
-    int Answer = 0;
+    int l = 1, r = L - 1;
     
-    while (Left <= Right)
+    while (l <= r)
     {
-        int Mid = (Left + Right) / 2;
-        int Count = 0;
+        int m = (l + r) / 2;
+        int k = 0;
         
-        for (int i = 1; i < Rests.size(); i++)
+        for (int i = 1; i < Rest.size(); ++i)
         {
-            int Diff = Rests[i] - Rests[i - 1];
-            Count += (Diff - 1) / Mid;
+            int dist = Rest[i] - Rest[i - 1];
+            
+            k += ((dist % m) == 0) ? (dist / m - 1) : (dist / m);
         }
         
-        if (Count > M)
+        if (k > M)
         {
-            Left = Mid + 1;
+            l = m + 1;
         }
         else
         {
-            Right = Mid - 1;
-            Answer = Mid;
+            r = m - 1;
         }
     }
     
-    cout << Answer;
-    
+    cout << l;
+
     return 0;
 }
