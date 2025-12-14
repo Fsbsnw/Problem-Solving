@@ -30,8 +30,8 @@ int main()
         
         for (int num : Jewel)
         {
-            count += (num + m - 1) / m;
-            if (count > N) break;
+            count += num / m;
+            if (num % m != 0) count++;
         }
         
         if (count > N)
