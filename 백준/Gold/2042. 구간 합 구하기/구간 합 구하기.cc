@@ -1,74 +1,80 @@
 #include <iostream>
-#include<vector>
-#include<cmath>
 
 using namespace std;
 
-int n, m, k;
-vector<long long> arr;
-vector<long long> tree;
+typedef long long ll;
 
-long long makeTree(int node, int start, int end)
+int N, M, K;
+ll Tree[1000000 * 4];
+ll Arr[1000001];
+
+void InitTree(int Node, int Left, int Right, int Index)
 {
-    if (start == end) return tree[node] = arr[start];
+    if (Index < Left || Index > Right) return;
     
-    int mid = (start + end) / 2;
+    Tree[Node] += Arr[Index];
     
-    return tree[node] = makeTree(node * 2, start, mid) + makeTree(node * 2 + 1, mid + 1, end);
+    if (Left != Right)
+    {
+        int Mid = (Left + Right) / 2;
+        InitTree(Node * 2, Left, Mid, Index);
+        InitTree(Node * 2 + 1, Mid + 1, Right, Index);
+    }
 }
 
-long long sumTree(int node, int start, int end, int left, int right)
+void UpdateTree(int Node, int Left, int Right, int Index, ll Diff)
 {
-    if (right < start || left > end) return 0;
-    if (left <= start && right >= end) return tree[node];
+    if (Index < Left || Index > Right) return;
     
-    int mid = (start + end) / 2;
-    return sumTree(node * 2, start, mid, left, right) + sumTree(node * 2 + 1, mid + 1, end, left, right);
+    Tree[Node] += Diff;
+    
+    if (Left != Right)
+    {
+        int Mid = (Left + Right) / 2;
+        UpdateTree(Node * 2, Left, Mid, Index, Diff);
+        UpdateTree(Node * 2 + 1, Mid + 1, Right, Index, Diff);
+    }
 }
 
-void update(int node, int start, int end, int idx, long long diff)
+ll GetSum(int Node, int Left, int Right, int Start, int End)
 {
-    if (idx < start || idx > end) return;
+    if (End < Left || Right < Start) return 0;
+    if (Start <= Left && Right <= End) return Tree[Node];
     
-    tree[node] += diff;
-    if (start == end) return;
-    
-    int mid = (start + end) / 2;
-    update(node * 2, start, mid, idx, diff);
-    update(node * 2 + 1, mid + 1, end, idx, diff);
+    int Mid = (Left + Right) / 2;
+    return GetSum(Node * 2, Left, Mid, Start, End) + GetSum(Node * 2 + 1, Mid + 1, Right, Start, End);
 }
 
 int main()
 {
-    cin >> n >> m >> k;
-    int h = (int)ceil(log2(n));
-    int size = (1 << (h + 1));
-    tree.resize(size);
-
-    for (int i = 0; i < n; i++)
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    
+    cin >> N >> M >> K;
+    
+    for (int i = 0; i < N; ++i)
     {
-        long long temp;
-        cin >> temp;
-        arr.push_back(temp);
+        cin >> Arr[i];
+        
+        InitTree(1, 0, N - 1, i);
     }
     
-    makeTree(1, 0, n - 1);
-    
-    for (int i = 0; i < m + k; i++)
+    for (int i = 0; i < M + K; ++i)
     {
         int a, b;
-        long long c;
+        ll c;
         cin >> a >> b >> c;
         
         if (a == 1)
         {
-            long long differVal = c - arr[b - 1];
-            arr[b - 1] = c;
-            update(1, 0, n - 1, b - 1, differVal);
+            ll Diff = c - Arr[b - 1];
+            Arr[b - 1] = c;
+            UpdateTree(1, 0, N - 1, b - 1, Diff);
         }
-        else if (a == 2)
+        else
         {
-            cout << sumTree(1, 0, n - 1, b - 1, c - 1) << endl;
+            cout << GetSum(1, 0, N - 1, b - 1, c - 1) << '\n';
         }
     }
     return 0;
