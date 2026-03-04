@@ -1,76 +1,28 @@
 #include <iostream>
-#include <vector>
-#include <unordered_map>
 #include <climits>
+#include <vector>
 
 using namespace std;
 
 int DP[1000001][2];
+vector<int> Tree[1000001];
 
-struct FNode
+void DFS(int Node, int Parent)
 {
-    FNode(int InID) : ID(InID) {};
-    int ID = 0;
-    vector<FNode*> Children;
-};
-
-class UTree
-{
-public:
-    UTree(int ID)
+    DP[Node][0] = 0;
+    DP[Node][1] = 1;
+    
+    for (int Child : Tree[Node])
     {
-        Root = new FNode(ID);
-        Index[ID] = Root;
-    }
-
-    void Insert(int A, int B)
-    {
-        FNode* ANode = GetOrCreate(A);
-        FNode* BNode = GetOrCreate(B);
+        if (Child == Parent) continue;
         
-        ANode->Children.push_back(BNode);
-        BNode->Children.push_back(ANode);
+        DFS(Child, Node);
+        int Child0 = DP[Child][0];
+        int Child1 = DP[Child][1];
+        DP[Node][0] += Child1;
+        DP[Node][1] += min(Child0, Child1);
     }
-    
-    int GetMinDP()
-    {
-        return CalcMinDP(Root, nullptr);
-    }
-    
-private:
-    FNode* Root;
-    
-    FNode* GetOrCreate(int ID)
-    {
-        if (Index.find(ID) == Index.end())
-        {
-            Index[ID] = new FNode(ID);
-        }
-        return Index[ID];
-    }
-    
-    int CalcMinDP(FNode* Node, FNode* Parent)
-    {
-        DP[Node->ID][0] = 0;
-        DP[Node->ID][1] = 1;
-        
-        for (FNode* Child : Node->Children)
-        {
-            if (Child == Parent) continue;
-            
-            CalcMinDP(Child, Node);
-            int Child0 = DP[Child->ID][0];
-            int Child1 = DP[Child->ID][1];
-            
-            DP[Node->ID][0] += DP[Child->ID][1];
-            DP[Node->ID][1] += min(Child0, Child1);
-        }
-        
-        return min(DP[Node->ID][0], DP[Node->ID][1]);
-    }
-    
-    unordered_map<int, FNode*> Index;
-};
+}
 
 int main()
 {
@@ -81,17 +33,18 @@ int main()
     int N;
     cin >> N;
     
-    UTree* Tree = new UTree(1);
-    
     for (int i = 0; i < N - 1; ++i)
     {
         int a, b;
         cin >> a >> b;
         
-        Tree->Insert(a, b);
+        Tree[a].push_back(b);
+        Tree[b].push_back(a);
     }
     
-    cout << Tree->GetMinDP();
+    DFS(1, -1);
+    
+    cout << min(DP[1][0], DP[1][1]);
 
     return 0;
 }
