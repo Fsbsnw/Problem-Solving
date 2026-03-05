@@ -6,12 +6,12 @@ using namespace std;
 vector<pair<int, int>> Tree[40001];
 int DP[40001];
 int Depths[40001];
-int Parents[40001];
+int Parents[40001][17];
 bool Visited[40001];
 
-void InitDepth(int Node, int Depth, int Parent)
+void InitTree(int Node, int Depth, int Parent)
 {
-    Parents[Node] = Parent;
+    Parents[Node][0] = Parent;
     Depths[Node] = Depth;
     Visited[Node] = true;
     
@@ -23,33 +23,32 @@ void InitDepth(int Node, int Depth, int Parent)
         int Cost = Pair.second;
         if (Visited[Child]) continue;
         DP[Child] = CurrDist + Cost;
-        InitDepth(Child, Depth + 1, Node);
+        InitTree(Child, Depth + 1, Node);
     }
 }
 
-void LCA(int A, int B)
+int LCA(int A, int B)
 {
-    int a = A;
-    int b = B;
+    if (Depths[A] < Depths[B]) swap(A, B);
     
-    while (A != B)
+    int Diff = Depths[A] - Depths[B];
+    
+    for (int i = 0; i < 17; ++i)
     {
-        if (Depths[A] == Depths[B])
-        {
-            A = Parents[A];
-            B = Parents[B];
-        }
-        else if (Depths[A] < Depths[B])
-        {
-            B = Parents[B];
-        }
-        else
-        {
-            A = Parents[A];            
-        }
+        if (Diff & (1 << i)) A = Parents[A][i];
     }
     
-    cout << DP[a] + DP[b] - 2 * DP[A] << '\n';
+    if (A == B) return A;
+    
+    for (int i = 16; i >= 0; --i)
+    {
+        if (Parents[A][i] != Parents[B][i])
+        {
+            A = Parents[A][i];
+            B = Parents[B][i];
+        }
+    }
+    return Parents[A][0];
 }
 
 int main()
@@ -70,7 +69,15 @@ int main()
         Tree[b].push_back({a, c});
     }
     
-    InitDepth(1, 0, 0);
+    InitTree(1, 0, 0);
+    
+    for (int i = 1; i < 17; ++i)
+    {
+        for (int j = 1; j <= N; ++j)
+        {
+            Parents[j][i] = Parents[Parents[j][i - 1]][i - 1];
+        }
+    }
     
     int M;
     cin >> M;
@@ -80,7 +87,7 @@ int main()
         int a, b;
         cin >> a >> b;
         
-        LCA(a, b);
+        cout << DP[a] + DP[b] - 2 * DP[LCA(a, b)] << '\n';
     }
     return 0;
 }
