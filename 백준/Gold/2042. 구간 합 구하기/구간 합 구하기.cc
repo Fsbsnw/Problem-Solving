@@ -4,45 +4,39 @@ using namespace std;
 
 typedef long long ll;
 
-int N, M, K;
 ll Arr[1000001];
-ll Tree[1000000 * 4];
+ll Tree[4000001];
 
-void TreeInsert(int Node, int Left, int Right, int Index)
+ll Init(int Left, int Right, int Node)
 {
-    if (Index < Left || Right < Index) return;
+    if (Left == Right) return Tree[Node] = Arr[Left];
     
-    Tree[Node] += Arr[Index];
+    int Mid = (Left + Right) / 2;
     
-    if (Left != Right)
-    {
-        int Mid = (Left + Right) / 2;
-        TreeInsert(Node * 2, Left, Mid, Index);
-        TreeInsert(Node * 2 + 1, Mid + 1, Right, Index);
-    }
+    return Tree[Node] = Init(Left, Mid, Node * 2) + Init(Mid + 1, Right, Node * 2 + 1);
 }
 
-void TreeUpdate(int Node, int Left, int Right, int Index, ll Diff)
+void Update(int Left, int Right, int Node, int Index, ll Diff)
 {
     if (Index < Left || Right < Index) return;
     
     Tree[Node] += Diff;
     
-   if (Left != Right)
-   {
-        int Mid = (Left + Right) / 2;
-        TreeUpdate(Node * 2, Left, Mid, Index, Diff);
-        TreeUpdate(Node * 2 + 1, Mid + 1, Right, Index, Diff);
-   }
+    if (Left == Right) return;
+    
+    int Mid = (Left + Right) / 2;
+    
+    Update(Left, Mid, Node * 2, Index, Diff);
+    Update(Mid + 1, Right, Node * 2 + 1, Index, Diff);
 }
 
-ll TreeSum(int Node, int Left, int Right, int Start, int End)
+ll Sum(int Left, int Right, int Start, int End, int Node)
 {
-    if (Right < Start || End < Left) return 0;
+    if (End < Left || Right < Start) return 0;
     if (Start <= Left && Right <= End) return Tree[Node];
     
     int Mid = (Left + Right) / 2;
-    return TreeSum(Node * 2, Left, Mid, Start, End) + TreeSum(Node * 2 + 1, Mid + 1, Right, Start, End);
+    return Sum(Left, Mid, Start, End, Node * 2) + Sum(Mid + 1, Right, Start, End, Node * 2 + 1);
 }
 
 int main()
@@ -51,31 +45,31 @@ int main()
     cin.tie(0);
     cout.tie(0);
     
+    ll N, M, K;
     cin >> N >> M >> K;
     
-    for (int i = 0; i < N; ++i)
+    for (int i = 1; i <= N; ++i) 
     {
         cin >> Arr[i];
-        
-        TreeInsert(1, 0, N - 1, i);
     }
+    
+    Init(1, N, 1);
     
     for (int i = 0; i < M + K; ++i)
     {
-        int a, b;
-        ll c;
+        int c, a;
+        ll b;
+        cin >> c >> a >> b;
         
-        cin >> a >> b >> c;
-        
-        if (a == 1)
+        if (c == 1)
         {
-            ll Diff = c - Arr[b - 1];
-            Arr[b - 1] = c;
-            TreeUpdate(1, 0, N - 1, b - 1, Diff);
+            ll Diff = b - Arr[a];
+            Arr[a] = b;
+            Update(1, N, 1, a, Diff);
         }
         else
         {
-            cout << TreeSum(1, 0, N - 1, b - 1, c - 1) << '\n';
+            cout << Sum(1, N, a, b, 1) << '\n';
         }
     }
 
