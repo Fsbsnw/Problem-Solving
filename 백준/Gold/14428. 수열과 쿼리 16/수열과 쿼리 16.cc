@@ -25,10 +25,6 @@ pair<int, int> Update(int Node, int Left, int Right, int Index, int Value)
     if (Index < Left || Right < Index) return Seg[Node];
     if (Left == Right) return Seg[Node] = make_pair(Value, Index);
     
-    if (Value == Seg[Node].first && Index < Seg[Node].second) Seg[Node].second = Index;
-    if (Value < Seg[Node].first) Seg[Node] = make_pair(Value, Index);
-    
-    
     int Mid = (Left + Right) / 2;
     pair<int, int> LeftPair = Update(Node * 2, Left, Mid, Index, Value);
     pair<int, int> RightPair = Update(Node * 2 + 1, Mid + 1, Right, Index, Value);
