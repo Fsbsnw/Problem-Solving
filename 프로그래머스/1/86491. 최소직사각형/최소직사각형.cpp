@@ -5,12 +5,11 @@ using namespace std;
 
 int solution(vector<vector<int>> sizes) {
     int mw = 0, mh = 0;
-
-    for (const vector<int>& size : sizes)
-    {
-        mw = max(mw, max(size[0], size[1]));
-        mh = max(mh, min(size[0], size[1]));
-    }
     
+    for (auto pair : sizes)
+    {
+        mw = max(mw, max(pair[0], pair[1]));
+        mh = max(mh, min(pair[0], pair[1]));
+    }
     return mw * mh;
 }
