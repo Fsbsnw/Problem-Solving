@@ -5,26 +5,44 @@
 using namespace std;
 
 vector<int> solution(vector<int> answers) {
-    vector<int> Base1 = {1, 2, 3, 4, 5};
-    vector<int> Base2 = {2, 1, 2, 3, 2, 4, 2, 5};
-    vector<int> Base3 = {3, 3, 1, 1, 2, 2, 4, 4, 5, 5};
+    vector<int> answer;
     
-    int Count1 = 0, Count2 = 0, Count3 = 0;
+    vector<int> arr1 = {1, 2, 3, 4, 5};
+    vector<int> arr2 = {2, 1, 2, 3, 2, 4, 2, 5};
+    vector<int> arr3 = {3, 3, 1, 1, 2, 2, 4, 4, 5, 5};
+    
+    int a = 0, b = 0, c = 0;
     
     for (int i = 0; i < answers.size(); ++i)
     {
-        if (answers[i] == Base1[i % 5]) ++Count1;
-        if (answers[i] == Base2[i % 8]) ++Count2;
-        if (answers[i] == Base3[i % 10]) ++Count3;
+        int num = answers[i];
+        
+        if (num == arr1[i % arr1.size()])
+        {
+            ++a;
+        }
+        if (num == arr2[i % arr2.size()])
+        {
+            ++b;
+        }
+        if (num == arr3[i % arr3.size()])
+        {
+            ++c;
+        }
     }
     
-    vector<int> answer;
+    vector<pair<int, int>> temp = {{a, 1}, {b, 2}, {c, 3}};
+    sort(temp.begin(), temp.end(), greater<pair<int, int>>());
     
-    int MaxCount = max({Count1, Count2, Count3});
-    
-    if (Count1 == MaxCount) answer.push_back(1);
-    if (Count2 == MaxCount) answer.push_back(2);
-    if (Count3 == MaxCount) answer.push_back(3);    
+    int max_value = temp[0].first;
+    for (auto pair : temp)
+    {
+        if (answer.empty() || max_value == pair.first)
+        {
+            answer.push_back(pair.second);
+        }
+    }
+    sort(answer.begin(), answer.end());
     
     return answer;
 }
